@@ -1,5 +1,3 @@
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
 from ytmusicapi import YTMusic
 import logging
 
@@ -7,23 +5,9 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Spotify API credentials
-Spotipy_client_id = 'your_Spotipy_client_id'
-Spotipy_client_secret = 'your_Spotipy_client_secret'
-spotipy_redirect_uri = 'your_spotipy_redirect_uri'
-
-
-# Authentication for Spotify
-scope = "user-library-read playlist-read-private"
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=Spotipy_client_id,
-                                               client_secret=Spotipy_client_secret,
-                                               redirect_uri=spotipy_redirect_uri,
-                                               scope=scope))
-
 # Authentication for YouTube Music
 ytmusic_instance = YTMusic('browser.json')
 
-# Function to check if a playlist exists in YouTube Music
 def playlist_exists(ytmusic_instance, name):
     playlists = ytmusic_instance.get_library_playlists()
     for playlist in playlists:
@@ -31,19 +15,6 @@ def playlist_exists(ytmusic_instance, name):
             return playlist['playlistId']
     return None
 
-# Function to get liked songs from Spotify
-def get_liked_songs():
-    results = sp.current_user_saved_tracks(limit=50)
-    tracks = [item['track']['name'] + ' ' + item['track']['artists'][0]['name'] for item in results['items'] if item['track']]
-
-    while results['next']:
-        results = sp.next(results)
-        tracks.extend([item['track']['name'] + ' ' + item['track']['artists'][0]['name'] for item in results['items'] if item['track']])
-
-    logger.info(f"Found {len(tracks)} liked songs on Spotify")
-    return tracks
-
-# Function to create YouTube Music playlists and add songs
 def create_ytmusic_playlists(spotify_playlists):
     for playlist in spotify_playlists:
         print("----------------")
@@ -87,23 +58,6 @@ def create_ytmusic_playlists(spotify_playlists):
         logger.info(f"Tracks added to playlist '{playlist['name']}': {added_tracks}")
         logger.info(f"Existing tracks in playlist '{playlist['name']}': {existing_tracks}")
 
-
-# Function to get Spotify playlists
-def get_spotify_playlists():
-    playlists = sp.current_user_playlists()
-    playlist_data = []
-    for playlist in playlists['items']:
-        logger.info(f"Fetching tracks for playlist: {playlist['name']}")
-        results = sp.playlist_items(playlist['id'])
-        if results and 'items' in results:
-            tracks = [item['track']['name'] + ' ' + item['track']['artists'][0]['name'] for item in results['items'] if item['track']]
-            playlist_data.append({'name': playlist['name'], 'tracks': tracks})
-            logger.info(f"Found {len(tracks)} tracks in playlist: {playlist['name']}")
-        else:
-            logger.warning(f"No items found in playlist: {playlist['name']}")
-    return playlist_data
-
-# Function to create a new YouTube Music playlist for liked songs from Spotify
 def create_liked_songs_playlist(liked_songs):
     playlist_name = "Liked from Spotify"
     playlist_id = playlist_exists(ytmusic_instance, playlist_name)
@@ -147,14 +101,3 @@ def create_liked_songs_playlist(liked_songs):
     logger.info(f"Total liked songs: {len(liked_songs)}")
     logger.info(f"Total tracks added: {added_tracks}")
     logger.info(f"Total existing tracks: {existing_tracks}")
-
-
-
-if __name__ == '__main__':
-    # Fetch playlists and liked songs from Spotify
-    spotify_playlists = get_spotify_playlists()
-    liked_songs = get_liked_songs()
-
-    # Create YouTube Music playlists and add liked songs
-    create_ytmusic_playlists(spotify_playlists)
-    create_liked_songs_playlist(liked_songs)
