@@ -7,9 +7,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Spotify API credentials
-Spotipy_client_id = '479f1138fed540f0b02eae5a24cd7825'
-Spotipy_client_secret = '470789ca05824266a028de1170e6d877'
-spotipy_redirect_uri = 'http://localhost:3000'
+Spotipy_client_id = 'your_Spotipy_client_id'
+Spotipy_client_secret = 'your_Spotipy_client_secret'
+spotipy_redirect_uri = 'your_spotipy_redirect_uri'
 
 # Authentication for Spotify
 scope = "user-library-read playlist-read-private"
