@@ -1,9 +1,13 @@
 from ytmusicapi import YTMusic
 import logging
+from browserfile_checker import check_file_exists
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+filename = 'browser.json'
+check_file_exists(filename)
 
 # Authentication for YouTube Music
 ytmusic_instance = YTMusic('browser.json')
@@ -50,6 +54,7 @@ def create_ytmusic_playlists(spotify_playlists):
                 else:
                     #logger.info(f"Track '{track}' already exists in playlist '{playlist['name']}'")
                     existing_tracks += 1
+                    print(existing_tracks)
             else:
                 logger.info(f"Track '{track}' not found on YouTube Music.")
 

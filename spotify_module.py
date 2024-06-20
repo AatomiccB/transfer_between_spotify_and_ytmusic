@@ -11,6 +11,7 @@ Spotipy_client_id = 'your_Spotipy_client_id'
 Spotipy_client_secret = 'your_Spotipy_client_secret'
 spotipy_redirect_uri = 'your_spotipy_redirect_uri'
 
+
 # Authentication for Spotify
 scope = "user-library-read playlist-read-private"
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=Spotipy_client_id,
