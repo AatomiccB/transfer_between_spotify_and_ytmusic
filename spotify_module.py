@@ -6,20 +6,15 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Spotify API credentials
-Spotipy_client_id = 'your_Spotipy_client_id'
-Spotipy_client_secret = 'your_Spotipy_client_secret'
-spotipy_redirect_uri = 'your_spotipy_redirect_uri'
+def get_spotify_client(client_id, client_secret, redirect_uri):
+    # Authentication for Spotify
+    scope = "user-library-read playlist-read-private"
+    return spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id,
+                                                     client_secret=client_secret,
+                                                     redirect_uri=redirect_uri,
+                                                     scope=scope))
 
-
-# Authentication for Spotify
-scope = "user-library-read playlist-read-private"
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=Spotipy_client_id,
-                                               client_secret=Spotipy_client_secret,
-                                               redirect_uri=spotipy_redirect_uri,
-                                               scope=scope))
-
-def get_liked_songs():
+def get_liked_songs(sp):
     results = sp.current_user_saved_tracks(limit=50)
     tracks = [item['track']['name'] + ' ' + item['track']['artists'][0]['name'] for item in results['items'] if item['track']]
 
@@ -30,7 +25,7 @@ def get_liked_songs():
     logger.info(f"Found {len(tracks)} liked songs on Spotify")
     return tracks
 
-def get_spotify_playlists():
+def get_spotify_playlists(sp):
     playlists = sp.current_user_playlists()
     playlist_data = []
     for playlist in playlists['items']:

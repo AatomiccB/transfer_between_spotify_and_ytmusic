@@ -1,16 +1,10 @@
 from ytmusicapi import YTMusic
 import logging
-from browserfile_checker import check_file_exists
+import json
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-filename = 'browser.json'
-check_file_exists(filename)
-
-# Authentication for YouTube Music
-ytmusic_instance = YTMusic('browser.json')
 
 def playlist_exists(ytmusic_instance, name):
     playlists = ytmusic_instance.get_library_playlists()
@@ -19,7 +13,8 @@ def playlist_exists(ytmusic_instance, name):
             return playlist['playlistId']
     return None
 
-def create_ytmusic_playlists(spotify_playlists):
+
+def create_ytmusic_playlists(ytmusic_instance, spotify_playlists):
     for playlist in spotify_playlists:
         print("----------------")
         playlist_id = playlist_exists(ytmusic_instance, playlist['name'])
@@ -48,22 +43,25 @@ def create_ytmusic_playlists(spotify_playlists):
                         added_tracks += 1
                     except Exception as e:
                         if 'HTTP 409' in str(e):
-                            logger.warning(f"Conflict error when adding track '{track}' to playlist '{playlist['name']}': {e}")
+                            logger.warning(
+                                f"Conflict error when adding track '{track}' to playlist '{playlist['name']}': {e}")
                         else:
                             logger.error(f"Error adding track '{track}' to playlist '{playlist['name']}': {e}")
                 else:
-                    #logger.info(f"Track '{track}' already exists in playlist '{playlist['name']}'")
+                    # logger.info(f"Track '{track}' already exists in playlist '{playlist['name']}'")
                     existing_tracks += 1
-                    print(existing_tracks)
+                    # print(existing_tracks)
+                    # print(existing_tracks)
             else:
                 logger.info(f"Track '{track}' not found on YouTube Music.")
 
         # Display total number of tracks in the Spotify playlist and the number of tracks added and existing in the YouTube Music playlist
-        #logger.info(f"Total tracks in Spotify playlist '{playlist['name']}': {len(playlist['tracks'])}")
+        # logger.info(f"Total tracks in Spotify playlist '{playlist['name']}': {len(playlist['tracks'])}")
         logger.info(f"Tracks added to playlist '{playlist['name']}': {added_tracks}")
         logger.info(f"Existing tracks in playlist '{playlist['name']}': {existing_tracks}")
 
-def create_liked_songs_playlist(liked_songs):
+
+def create_liked_songs_playlist(ytmusic_instance, liked_songs):
     playlist_name = "Liked from Spotify"
     playlist_id = playlist_exists(ytmusic_instance, playlist_name)
 
@@ -95,9 +93,9 @@ def create_liked_songs_playlist(liked_songs):
                     else:
                         logger.error(f"Error adding track '{track}' to playlist '{playlist_name}': {e}")
             else:
-                #logger.info(f"Track '{track}' already exists in playlist '{playlist_name}'")
+                # logger.info(f"Track '{track}' already exists in playlist '{playlist_name}'")
                 existing_tracks += 1
-                #print("Existing track count: ",existing_tracks)
+                # print("Existing track count: ",existing_tracks)
         else:
             logger.info(f"Track '{track}' not found on YouTube Music.")
 
